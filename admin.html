@@ -1,1 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Panel</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
 
+<h2>Admin Login</h2>
+<input type="password" id="password">
+<button onclick="login()">Login</button>
+
+<div id="panel" style="display:none;padding:40px;">
+<h2>Add Product</h2>
+
+<input id="name" placeholder="Product Name"><br><br>
+<input id="price" placeholder="Price"><br><br>
+<input type="file" id="image"><br><br>
+
+<select id="category">
+<option value="bitepoint">BitePoint</option>
+<option value="clothes">Clothes</option>
+<option value="shoes">Shoes</option>
+</select><br><br>
+
+<button onclick="addProduct()">Add Product</button>
+</div>
+
+<script>
+const supabaseUrl="YOUR_SUPABASE_URL";
+const supabaseKey="YOUR_PUBLIC_ANON_KEY";
+const db=supabase.createClient(supabaseUrl,supabaseKey);
+
+function login(){
+if(password.value==="1234"){
+panel.style.display="block";
+}
+}
+
+async function addProduct(){
+
+let file=image.files[0];
+let fileName=Date.now()+"_"+file.name;
+
+await db.storage.from("images").upload(fileName,file);
+
+let {data}=db.storage.from("images").getPublicUrl(fileName);
+
+await db.from("products").insert([{
+name:name.value,
+price:price.value,
+image:data.publicUrl,
+category:category.value
+}]);
+
+alert("Product Added Successfully");
+}
+</script>
+</body>
+</html>
